@@ -1,2 +1,2 @@
 # android-better-progressdialog
-A better looking progress dialog for Android
+A better looking progress dialog for Android inspired by ios
