@@ -3,132 +3,302 @@ package com.rw.betterprogress;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
+@SuppressWarnings("WeakerAccess")
 public class ProgressDialog
 {
-    private Context context;
-    private AlertDialog dialog;
+
+    private Context mContext;
+    private AlertDialog mDialog;
 
     private RelativeLayout mContainer;
-    private TextView mRightText;
+    private TextView mMessageText;
     private ProgressBar mProgress;
 
     private String mProgressMessage = "";
-    private TextLocation location = TextLocation.Right;
 
-    private Builder builder = null;
 
-    public enum TextLocation
+    /**
+     * Text position (on right (android style) or bottom (ios style) of progress spinner)
+     */
+    public enum TextPosition
     {
         Right, Bottom
     }
 
+    /**
+     *
+     * @param ctx the calling activity context
+     */
     public ProgressDialog(Context ctx)
     {
-        context = ctx;
+        mContext = ctx;
 
-        init();
+        init(-1, -1, -1, TextPosition.Right);
     }
 
-    public ProgressDialog(Context ctx, String mProgressMessage)
+    /**
+     *
+     * @param ctx the calling activity context
+     * @param message progress message
+     */
+    public ProgressDialog(Context ctx, String message)
     {
-        context = ctx;
-        this.mProgressMessage = mProgressMessage;
+        mContext = ctx;
+        mProgressMessage = message;
 
-        init();
-
-        setTextLocation();
+        init(-1, -1, -1, TextPosition.Right);
     }
 
-    private void init()
+    /**
+     *
+     * @param ctx the calling activity context
+     * @param message progress message
+     * @param progressColor color of the progress spinner
+     */
+    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor)
     {
-        AlertDialog.Builder b = new AlertDialog.Builder(context);
+        mContext = ctx;
+        mProgressMessage = message;
+
+        init(progressColor, -1, -1, TextPosition.Right);
+    }
+
+    /**
+     *
+     * @param ctx the calling activity context
+     * @param message progress message
+     * @param progressColor color of the progress spinner
+     * @param backgroundColor color of the dialog
+     * @param textColor font color
+     */
+    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor)
+    {
+        mContext = ctx;
+        mProgressMessage = message;
+
+        init(progressColor, backgroundColor, textColor, TextPosition.Right);
+    }
+
+    /**
+     *
+     * @param ctx the calling activity context
+     * @param message progress message
+     * @param progressColor color of the progress spinner
+     * @param backgroundColor color of the dialog
+     * @param textColor font color
+     * @param position text position relative to the progress spinner
+     */
+    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor, TextPosition position)
+    {
+        mContext = ctx;
+        mProgressMessage = message;
+
+        init(progressColor, backgroundColor, textColor, position);
+    }
+
+
+    /**
+     * Initialize the dialog window with the parameters passed via the constructor
+     *
+     * @param progressColor   Color of the progress spinner circle
+     * @param backgroundColor Color of the dialog background drawale
+     * @param textColor       Color of the dialog message text
+     * @param position        Text position (on right (android style) or bottom (ios style) of progress spinner)
+     */
+    private void init(@ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor, TextPosition position)
+    {
+        AlertDialog.Builder b = new AlertDialog.Builder(mContext);
         b.setTitle("");
         b.setCancelable(false);
 
-        @SuppressLint("InflateParams") View v = LayoutInflater.from(context).inflate(R.layout.commonutils_dialog_progress, null);
+        @SuppressLint("InflateParams") View v = LayoutInflater.from(mContext).inflate(R.layout.commonutils_dialog_progress, null);
 
-        mRightText = (TextView)v.findViewById(R.id.commonutils_dialog_progress_textView);
-        mProgress = (ProgressBar)v.findViewById(R.id.commonutils_dialog_progress_bar);
-        mContainer = (RelativeLayout)v.findViewById(R.id.commonutils_dialog_container);
+        mMessageText = (TextView) v.findViewById(R.id.commonutils_dialog_progress_textView);
+        mProgress = (ProgressBar) v.findViewById(R.id.commonutils_dialog_progress_bar);
+        mContainer = (RelativeLayout) v.findViewById(R.id.commonutils_dialog_container);
 
-        setBackgroundColor(Color.WHITE);
+        //set colors if passed via constructor
+        if (progressColor != -1)
+            setProgressColor(progressColor);
 
-        mRightText.setText(mProgressMessage);
+        if (textColor != -1)
+            setTextColor(textColor);
+
+        if (backgroundColor != -1)
+            setBackgroundColor(backgroundColor);
+        else
+            setBackgroundColor(getDefaultThemeBackgroundColor());
+
+
+        mMessageText.setText(mProgressMessage);
+
+        setTextPosition(position);
 
         b.setView(v);
-
-        dialog = b.create();
-
+        mDialog = b.create();
     }
 
-    public void setBackgroundColor(int color)
-    {
-        Drawable background = ContextCompat.getDrawable(context, R.drawable.rounded_rect_white);
-        background.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.ADD));
-
-        mContainer.setBackground(background);
-    }
-
-    public void setColors(int progressColor, int backgroundColor, int textColor)
-    {
-        setProgressColor(progressColor);
-        setBackgroundColor(backgroundColor);
-        setTextColor(textColor);
-    }
-
+    /**
+     * Set the progress message font color
+     *
+     * @param color font color
+     */
     public void setTextColor(int color)
     {
-        mRightText.setTextColor(color);
+        mMessageText.setTextColor(color);
     }
 
+    /**
+     * Set the progress circle color
+     *
+     * @param color progress color
+     */
     public void setProgressColor(int color)
     {
         Drawable spinner = mProgress.getIndeterminateDrawable();
         spinner.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
     }
 
+    /**
+     * Set the dialog bakground color
+     *
+     * @param color the background color
+     */
+    public void setBackgroundColor(@ColorInt int color)
+    {
+        Drawable background = ContextCompat.getDrawable(mContext, R.drawable.rounded_rect_white);
+        background.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.ADD));
+
+        mContainer.setBackground(background);
+    }
+
+    /**
+     * set a custom background drawable to the dialog
+     *
+     * @param drawable custom background drawable
+     */
+    public void setBackgroundDrawable(Drawable drawable)
+    {
+        mContainer.setBackground(drawable);
+    }
+
+    /**
+     * Set the progress, background and text colors
+     *
+     * @param progressColor   progress color
+     * @param backgroundColor background color
+     * @param textColor       text color
+     */
+    public void setColors(@ColorInt int progressColor, int backgroundColor, int textColor)
+    {
+        setProgressColor(progressColor);
+        setBackgroundColor(backgroundColor);
+        setTextColor(textColor);
+    }
+
+
+    /**
+     * Set the progress message without changing text position
+     *
+     * @param message progress message
+     */
     public void setMessage(String message)
     {
         this.mProgressMessage = message;
 
-        setTextLocation();
+        mMessageText.setText(mProgressMessage);
     }
 
-    public void setMessage(String message, TextLocation location)
+    /**
+     * Set the progress message with text position
+     *
+     * @param message  progress message
+     * @param position text position
+     */
+    public void setMessage(String message, TextPosition position)
     {
-        this.location = location;
-        this.mProgressMessage = message;
+        setMessage(message);
 
-        setTextLocation();
+        setTextPosition(position);
     }
 
+    /**
+     * Show the dialog
+     */
     public void show()
     {
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(null);
+        mDialog.show();
+
+        Window window = mDialog.getWindow();
+
+        if (window != null)
+            window.setBackgroundDrawable(null);
     }
 
-
-    private void setTextLocation()
+    /**
+     * Dismiss the dialog
+     */
+    public void dismiss()
     {
-        mRightText.setVisibility(View.VISIBLE);
+        mDialog.dismiss();
+    }
 
-        RelativeLayout.LayoutParams lpText = (RelativeLayout.LayoutParams) mRightText.getLayoutParams();
+    /**
+     *
+     * @return returns true if the dialog is visible
+     */
+    public boolean isShowing()
+    {
+        return mDialog.isShowing();
+    }
+
+    /**
+     * Retrieve the default background color of the current theme of the calling activity
+     *
+     * @return current default background color
+     */
+    private
+    @ColorInt
+    int getDefaultThemeBackgroundColor()
+    {
+        TypedArray array = mContext.getTheme().obtainStyledAttributes(new int[]{
+                android.R.attr.colorBackground,
+                android.R.attr.textColorPrimary,
+        });
+
+        int ret = array.getColor(0, ContextCompat.getColor(mContext, android.R.color.background_light));
+
+        array.recycle();
+
+        return ret;
+    }
+
+    /**
+     * set the text position relative to the progress spinner circle
+     */
+    public void setTextPosition(TextPosition position)
+    {
+
+        if(mProgressMessage != null && mProgressMessage.length() > 0)
+            mMessageText.setVisibility(View.VISIBLE);
+
+        RelativeLayout.LayoutParams lpText = (RelativeLayout.LayoutParams) mMessageText.getLayoutParams();
         lpText.removeRule(RelativeLayout.END_OF);
         lpText.removeRule(RelativeLayout.BELOW);
         lpText.topMargin = 0;
@@ -138,13 +308,13 @@ public class ProgressDialog
         RelativeLayout.LayoutParams lpProg = (RelativeLayout.LayoutParams) mProgress.getLayoutParams();
         lpProg.removeRule(RelativeLayout.CENTER_HORIZONTAL);
 
-        float density = context.getResources().getDisplayMetrics().density;
+        float density = mContext.getResources().getDisplayMetrics().density;
 
-        if(location == TextLocation.Right)
+        if (position == TextPosition.Right)
         {
             lpText.addRule(RelativeLayout.END_OF, R.id.commonutils_dialog_progress_bar);
             lpText.leftMargin = (int) (5 * density);
-            lpText.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, Gravity.LEFT);
+            lpText.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, Gravity.START);
         }
         else
         {
@@ -156,80 +326,9 @@ public class ProgressDialog
         }
 
         mProgress.setLayoutParams(lpProg);
-        mRightText.setLayoutParams(lpText);
+        mMessageText.setLayoutParams(lpText);
 
-        mRightText.setText(mProgressMessage);
+        mMessageText.setText(mProgressMessage);
     }
 
-
-    public static class Builder
-    {
-        private Context context = null;
-        private String message = "";
-        private @ColorInt int colorProg = -1;
-        private @ColorInt int colorText = -1;
-        private @ColorInt int colorBack = -1;
-
-        private Builder()
-        {
-
-        }
-
-        public static Builder using(Context c)
-        {
-            Builder b = new Builder();
-
-            b.context = c;
-            return b;
-        }
-
-        public Builder setMessage(String message)
-        {
-            this.message = message;
-
-            return this;
-        }
-
-        public Builder setProgressColor(@ColorInt int color)
-        {
-            this.colorProg = color;
-            return this;
-        }
-
-        public Builder setBackgroundColor(@ColorInt int color)
-        {
-            this.colorBack = color;
-            return this;
-        }
-
-        public Builder setTextColor(@ColorInt int color)
-        {
-            this.colorText = color;
-            return this;
-        }
-
-        public ProgressDialog show()
-        {
-            ProgressDialog pd = create();
-            pd.show();
-
-            return pd;
-        }
-
-        public ProgressDialog create()
-        {
-            ProgressDialog pd = new ProgressDialog(context, message);
-
-            if(colorProg != -1)
-                pd.setProgressColor(colorProg);
-
-            if(colorText != -1)
-                pd.setTextColor(colorText);
-
-            if(colorBack != -1)
-                pd.setBackgroundColor(colorBack);
-
-            return pd;
-        }
-    }
 }

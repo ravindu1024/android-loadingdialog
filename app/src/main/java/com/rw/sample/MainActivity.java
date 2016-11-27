@@ -15,11 +15,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        ProgressDialog pd = new ProgressDialog(this, "progress...");
-//        pd.setColors(Color.BLUE, Color.DKGRAY, Color.WHITE);
-//
-//        pd.show();
+        ProgressDialog pd = new ProgressDialog(this, "progress...", Color.RED);
+        //pd.setColors(Color.BLUE, Color.DKGRAY, Color.WHITE);
+        pd.setTextPosition(ProgressDialog.TextPosition.Bottom);
 
-        ProgressDialog.Builder.using(this).setMessage("hello world").setBackgroundColor(Color.DKGRAY).show();
+        pd.show();
+
     }
 }
