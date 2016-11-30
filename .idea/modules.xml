@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/better_progress_dialog.iml" filepath="$PROJECT_DIR$/better_progress_dialog.iml" />
-      <module fileurl="file://$PROJECT_DIR$/betterprogress/betterprogress.iml" filepath="$PROJECT_DIR$/betterprogress/betterprogress.iml" />
+      <module fileurl="file://$PROJECT_DIR$/loadingdialog/loadingdialog.iml" filepath="$PROJECT_DIR$/loadingdialog/loadingdialog.iml" />
     </modules>
   </component>
 </project>

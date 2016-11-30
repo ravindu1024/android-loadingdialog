@@ -7,7 +7,7 @@
     >
 
     <RelativeLayout
-        android:id="@+id/commonutils_dialog_container"
+        android:id="@+id/rw_dialog_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/commonutils_dialog_progress_bar"
-            android:id="@+id/commonutils_dialog_progress_textView"
+            android:layout_toEndOf="@+id/rw_dialog_progress_bar"
+            android:id="@+id/rw_dialog_progress_textView"
             android:visibility="gone"
             android:layout_marginStart="10dp"
             android:gravity="center_horizontal"
@@ -27,7 +27,7 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/commonutils_dialog_progress_bar"
+            android:id="@+id/rw_dialog_progress_bar"
             android:background="@android:color/transparent"
             />
 

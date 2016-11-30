@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.rw.betterprogress.ProgressDialog;
+import com.rw.loadingdialog.LoadingDialog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -15,9 +15,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ProgressDialog pd = new ProgressDialog(this, "progress...", Color.RED);
+        LoadingDialog pd = new LoadingDialog(this, "progress...", Color.RED);
         //pd.setColors(Color.BLUE, Color.DKGRAY, Color.WHITE);
-        pd.setTextPosition(ProgressDialog.TextPosition.Bottom);
+        pd.setTextPosition(LoadingDialog.TextPosition.Bottom);
 
         pd.show();
 

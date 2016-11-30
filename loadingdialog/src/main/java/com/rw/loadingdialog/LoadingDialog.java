@@ -1,4 +1,4 @@
-package com.rw.betterprogress;
+package com.rw.loadingdialog;
 
 
 import android.annotation.SuppressLint;
@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 
 @SuppressWarnings("WeakerAccess")
-public class ProgressDialog
+public class LoadingDialog
 {
 
     private Context mContext;
@@ -45,7 +45,7 @@ public class ProgressDialog
      *
      * @param ctx the calling activity context
      */
-    public ProgressDialog(Context ctx)
+    public LoadingDialog(Context ctx)
     {
         mContext = ctx;
 
@@ -57,7 +57,7 @@ public class ProgressDialog
      * @param ctx the calling activity context
      * @param message progress message
      */
-    public ProgressDialog(Context ctx, String message)
+    public LoadingDialog(Context ctx, String message)
     {
         mContext = ctx;
         mProgressMessage = message;
@@ -71,7 +71,7 @@ public class ProgressDialog
      * @param message progress message
      * @param progressColor color of the progress spinner
      */
-    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor)
+    public LoadingDialog(Context ctx, String message, @ColorInt int progressColor)
     {
         mContext = ctx;
         mProgressMessage = message;
@@ -87,7 +87,7 @@ public class ProgressDialog
      * @param backgroundColor color of the dialog
      * @param textColor font color
      */
-    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor)
+    public LoadingDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor)
     {
         mContext = ctx;
         mProgressMessage = message;
@@ -104,7 +104,7 @@ public class ProgressDialog
      * @param textColor font color
      * @param position text position relative to the progress spinner
      */
-    public ProgressDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor, TextPosition position)
+    public LoadingDialog(Context ctx, String message, @ColorInt int progressColor, @ColorInt int backgroundColor, @ColorInt int textColor, TextPosition position)
     {
         mContext = ctx;
         mProgressMessage = message;
@@ -127,10 +127,10 @@ public class ProgressDialog
         b.setTitle("");
         b.setCancelable(false);
 
-        @SuppressLint("InflateParams") View v = LayoutInflater.from(mContext).inflate(R.layout.commonutils_dialog_progress, null);
+        @SuppressLint("InflateParams") View v = LayoutInflater.from(mContext).inflate(R.layout.rw_dialog_progress, null);
 
         mMessageText = (TextView) v.findViewById(R.id.commonutils_dialog_progress_textView);
-        mProgress = (ProgressBar) v.findViewById(R.id.commonutils_dialog_progress_bar);
+        mProgress = (ProgressBar) v.findViewById(R.id.rw_dialog_progress_bar);
         mContainer = (RelativeLayout) v.findViewById(R.id.commonutils_dialog_container);
 
         //set colors if passed via constructor
@@ -182,7 +182,7 @@ public class ProgressDialog
      */
     public void setBackgroundColor(@ColorInt int color)
     {
-        Drawable background = ContextCompat.getDrawable(mContext, R.drawable.rounded_rect_white);
+        Drawable background = ContextCompat.getDrawable(mContext, R.drawable.rw_rounded_rect_white);
         background.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.ADD));
 
         mContainer.setBackground(background);
@@ -312,13 +312,13 @@ public class ProgressDialog
 
         if (position == TextPosition.Right)
         {
-            lpText.addRule(RelativeLayout.END_OF, R.id.commonutils_dialog_progress_bar);
+            lpText.addRule(RelativeLayout.END_OF, R.id.rw_dialog_progress_bar);
             lpText.leftMargin = (int) (5 * density);
             lpText.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, Gravity.START);
         }
         else
         {
-            lpText.addRule(RelativeLayout.BELOW, R.id.commonutils_dialog_progress_bar);
+            lpText.addRule(RelativeLayout.BELOW, R.id.rw_dialog_progress_bar);
             lpText.topMargin = (int) (5 * density);
             lpText.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, Gravity.CENTER_HORIZONTAL);
 

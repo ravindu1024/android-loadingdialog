@@ -1,4 +1,4 @@
-package com.rw.betterprogress;
+package com.rw.loadingdialog;
 
 import org.junit.Test;
 
