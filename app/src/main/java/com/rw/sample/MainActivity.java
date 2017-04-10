@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LoadingDialog pd = new LoadingDialog(this, "progress...", Color.RED);
+        LoadingDialog pd = new LoadingDialog(this, "progress...");
         //pd.setColors(Color.BLUE, Color.DKGRAY, Color.WHITE);
         pd.setTextPosition(LoadingDialog.TextPosition.Bottom);
 

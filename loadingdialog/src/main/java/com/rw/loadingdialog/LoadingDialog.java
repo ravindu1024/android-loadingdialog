@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,11 +130,12 @@ public class LoadingDialog
 
         @SuppressLint("InflateParams") View v = LayoutInflater.from(mContext).inflate(R.layout.rw_dialog_progress, null);
 
-        mMessageText = (TextView) v.findViewById(R.id.commonutils_dialog_progress_textView);
+        mMessageText = (TextView) v.findViewById(R.id.rw_dialog_progress_textView);
         mProgress = (ProgressBar) v.findViewById(R.id.rw_dialog_progress_bar);
-        mContainer = (RelativeLayout) v.findViewById(R.id.commonutils_dialog_container);
+        mContainer = (RelativeLayout) v.findViewById(R.id.rw_dialog_container);
 
         //set colors if passed via constructor
+        setProgressColor(fetchAccentColor());
         if (progressColor != -1)
             setProgressColor(progressColor);
 
@@ -329,6 +331,17 @@ public class LoadingDialog
         mMessageText.setLayoutParams(lpText);
 
         mMessageText.setText(mProgressMessage);
+    }
+
+    private int fetchAccentColor() {
+        TypedValue typedValue = new TypedValue();
+
+        TypedArray a = mContext.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorAccent });
+        int color = a.getColor(0, 0);
+
+        a.recycle();
+
+        return color;
     }
 
 }
