@@ -4,8 +4,10 @@ package com.rw.loadingdialog;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
@@ -144,8 +146,8 @@ public class LoadingDialog
 
         if (backgroundColor != -1)
             setBackgroundColor(backgroundColor);
-        else
-            setBackgroundColor(getDefaultThemeBackgroundColor());
+//        else
+//            setBackgroundColor(Color.WHITE/* getDefaultThemeBackgroundColor()*/);
 
 
         mMessageText.setText(mProgressMessage);
@@ -184,10 +186,8 @@ public class LoadingDialog
      */
     public void setBackgroundColor(@ColorInt int color)
     {
-        Drawable background = ContextCompat.getDrawable(mContext, R.drawable.rw_rounded_rect_white);
-        background.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.ADD));
-
-        mContainer.setBackground(background);
+        Drawable background = mContainer.getBackground();
+        background.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
     }
 
     /**
@@ -250,7 +250,7 @@ public class LoadingDialog
         Window window = mDialog.getWindow();
 
         if (window != null)
-            window.setBackgroundDrawable(null);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     /**
