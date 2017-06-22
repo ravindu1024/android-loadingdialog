@@ -22,6 +22,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+
+/**
+ * Displays a fully customisable iOS inspired progress dialog
+ * USage:   LoadingDialog dialog = new LoadingDialog(Context, String);
+ *          dialog.show();
+ */
 @SuppressWarnings("WeakerAccess")
 public class LoadingDialog
 {
@@ -137,7 +143,7 @@ public class LoadingDialog
         mContainer = (RelativeLayout) v.findViewById(R.id.rw_dialog_container);
 
         //set colors if passed via constructor
-        setProgressColor(fetchAccentColor());
+        setProgressColor(Utils.getAccentColor(mContext));
         if (progressColor != -1)
             setProgressColor(progressColor);
 
@@ -333,15 +339,6 @@ public class LoadingDialog
         mMessageText.setText(mProgressMessage);
     }
 
-    private int fetchAccentColor() {
-        TypedValue typedValue = new TypedValue();
 
-        TypedArray a = mContext.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorAccent });
-        int color = a.getColor(0, 0);
-
-        a.recycle();
-
-        return color;
-    }
 
 }
