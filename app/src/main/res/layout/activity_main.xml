@@ -30,4 +30,30 @@
             android:inputType="textPersonName"
             android:text="Name"/>
     </FrameLayout>
+
+    <Button
+        android:id="@+id/button_failed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="failed"/>
+
+    <Button
+        android:id="@+id/button_hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="hide"/>
+
+    <Button
+        android:id="@+id/button_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="13dp"
+        android:layout_toStartOf="@+id/button_hide"
+        android:text="show"/>
+
 </RelativeLayout>

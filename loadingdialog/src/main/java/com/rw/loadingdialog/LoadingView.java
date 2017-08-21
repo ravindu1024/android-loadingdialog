@@ -10,8 +10,10 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,6 +56,11 @@ public class LoadingView
     public enum ProgressStyle
     {
         HORIZONTAL, CYCLIC;
+    }
+
+    public interface OnRefreshClickListener
+    {
+        void onRefreshClicked();
     }
 
 
@@ -270,7 +277,11 @@ public class LoadingView
     public void show()
     {
         hide();
+        Log.d("IMG", "show view");
         mTargetView.addView(mRootLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mRetryContainer.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -278,6 +289,7 @@ public class LoadingView
      */
     public void hide()
     {
+        Log.d("IMG", "hide view");
         mTargetView.removeView(mRootLayout);
     }
 
@@ -342,16 +354,57 @@ public class LoadingView
         drawable.clearColorFilter();
     }
 
+    /**
+     * same as {@link ProgressBar#setIndeterminate(boolean)}
+     * @param indeterminate
+     */
     public void setIndeterminate(boolean indeterminate)
     {
         mProgressBar.setIndeterminate(indeterminate);
         mIsIndeterminate = indeterminate;
     }
 
+    /**
+     * same as {@link ProgressBar#setProgress(int)}
+     * @param progress
+     */
     public void setProgress(int progress)
     {
         mProgressBar.setProgress(progress);
         mProgress = progress;
+    }
+
+    public void setLoadingFailed(final OnRefreshClickListener listener)
+    {
+        setLoadingFailed(null, null, listener);
+    }
+
+    public void setLoadingFailed(@Nullable String message, @Nullable String buttonText, final OnRefreshClickListener listener)
+    {
+        mProgressBar.setVisibility(View.GONE);
+        mRetryContainer.setVisibility(View.VISIBLE);
+
+        if(message == null)
+            message = mContext.getString(R.string.load_failed);
+
+        if(buttonText == null)
+            buttonText = mContext.getString(R.string.retry_btn);
+
+        mRetryText.setText(message);
+        mRetryButton.setText(buttonText);
+
+        mRetryButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(listener != null)
+                    listener.onRefreshClicked();
+
+                mRetryContainer.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private View.OnTouchListener touchListener = new View.OnTouchListener()
