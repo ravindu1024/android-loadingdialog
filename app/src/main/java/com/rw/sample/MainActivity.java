@@ -2,12 +2,14 @@ package com.rw.sample;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.rw.loadingdialog.LoadingDialog;
 import com.rw.loadingdialog.LoadingView;
@@ -27,13 +29,10 @@ public class MainActivity extends AppCompatActivity
 //        pd.setBackgroundColor(Color.CYAN);
         //pd.setBackgroundDrawable(getResources().getDrawable(R.drawable.rw_rounded_rect_white));
 
-        FrameLayout frame = (FrameLayout)findViewById(R.id.framelayout);
+        ConstraintLayout frame = findViewById(R.id.framelayout);
 
         final LoadingView loadingView = new LoadingView.Builder(this)
-//                                .setProgressStyle(LoadingView.ProgressStyle.HORIZONTAL)
                                 .setBackgroundColor(Color.WHITE)
-                                .setCustomMargins(0, 100, 100, 0)
-                                .setHorizontalBarMarginPercentage(0.2f)
                                 .attachTo(frame);
 
         loadingView.show();

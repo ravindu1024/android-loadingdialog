@@ -12,14 +12,15 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,7 +56,7 @@ public class LoadingView
 
     public enum ProgressStyle
     {
-        HORIZONTAL, CYCLIC;
+        HORIZONTAL, CYCLIC
     }
 
     public interface OnRefreshClickListener
@@ -146,7 +147,7 @@ public class LoadingView
 
         public LoadingView attachTo(Activity act)
         {
-            mTarget = (ViewGroup) act.findViewById(android.R.id.content);
+            mTarget = act.findViewById(android.R.id.content);
 
             return attachTo(mTarget);
         }
@@ -155,7 +156,12 @@ public class LoadingView
         {
             mTarget = target;
 
-            return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns, mStyl, mIndtrmnt, mHBarMarginPer);
+            if(mTarget instanceof RelativeLayout || mTarget instanceof FrameLayout || mTarget instanceof ConstraintLayout)
+            {
+                return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns, mStyl, mIndtrmnt, mHBarMarginPer);
+            }
+            else
+                throw new RuntimeException("Unsupported target view. Parent should be one of RelativeLayout, FrameLayout and ConstraintLayout");
         }
     }
 
@@ -179,11 +185,11 @@ public class LoadingView
         mRootLayout = (RelativeLayout) inflater.inflate(R.layout.rw_layout_progress, mTargetView, false);
 
         mBackground = mRootLayout.findViewById(R.id.rw_loadingview_background);
-        mRetryContainer = (RelativeLayout) mRootLayout.findViewById(R.id.rw_loadingview_retry_container);
+        mRetryContainer = mRootLayout.findViewById(R.id.rw_loadingview_retry_container);
 
         if(style == ProgressStyle.HORIZONTAL)
         {
-            mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress2);
+            mProgressBar = mRootLayout.findViewById(R.id.rw_loadingview_progress2);
 
             mProgressBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
             {
@@ -193,20 +199,20 @@ public class LoadingView
                     mProgressBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mProgressBar.getLayoutParams();
-                    lp.setMarginStart((int) (mRootLayout.getWidth() * marginPercentge));
-                    lp.setMarginEnd((int) (mRootLayout.getWidth() * marginPercentge));
+                    int m = ((int) (mRootLayout.getWidth() * marginPercentge));
+                    lp.setMargins(m, 0, m, 0);
 
                     mProgressBar.setLayoutParams(lp);
                 }
             });
         }
         else
-            mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress);
+            mProgressBar = mRootLayout.findViewById(R.id.rw_loadingview_progress);
 
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mRetryText = (TextView) mRootLayout.findViewById(R.id.rw_loading_failed_text);
-        mRetryButton = (Button) mRootLayout.findViewById(R.id.rw_loadingview_btn_retry);
+        mRetryText = mRootLayout.findViewById(R.id.rw_loading_failed_text);
+        mRetryButton = mRootLayout.findViewById(R.id.rw_loadingview_btn_retry);
 
         mRetryContainer.setVisibility(View.GONE);
 
@@ -277,7 +283,6 @@ public class LoadingView
     public void show()
     {
         hide();
-        Log.d("IMG", "show view");
         mTargetView.addView(mRootLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         mRetryContainer.setVisibility(View.GONE);
@@ -289,7 +294,6 @@ public class LoadingView
      */
     public void hide()
     {
-        Log.d("IMG", "hide view");
         mTargetView.removeView(mRootLayout);
     }
 
