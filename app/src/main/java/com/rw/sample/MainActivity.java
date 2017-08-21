@@ -26,12 +26,24 @@ public class MainActivity extends AppCompatActivity
 
         FrameLayout frame = (FrameLayout)findViewById(R.id.framelayout);
 
-        LoadingView view = new LoadingView(this, -1, Color.WHITE);
-        view.setCustomMarginDimensions(0, R.dimen.margin, 0, 0);
-        //view.setBackgroundColor(Color.WHITE);
-        view.setTouchThroughEnabled(false);
+        LoadingView view = new LoadingView.Builder(this)
+                                .setBackgroundColor(Color.WHITE)
+                                .setCustomMargins(0, 100, 100, 0)
+                                .attachTo(frame);
 
         view.show();
+
+//        view.setProgressColor(Color.RED);
+//
+//        frame.postDelayed(new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                view.resetProgressColor();
+//            }
+//        }, 3000);
+
 
     }
 }

@@ -27,6 +27,7 @@ import android.widget.TextView;
  * Displays a fully customisable iOS inspired progress dialog
  * USage:   LoadingDialog dialog = new LoadingDialog(Context, String);
  *          dialog.show();
+ * @deprecated Blocking progress dialogs have been depricated by android. see {@link android.app.ProgressDialog}
  */
 @SuppressWarnings("WeakerAccess")
 public class LoadingDialog

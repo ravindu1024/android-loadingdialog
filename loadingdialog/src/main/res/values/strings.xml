@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Loading Dialog</string>
+
+    <string name="load_failed">Could not complete operation</string>
+    <string name="retry_btn">retry</string>
 </resources>

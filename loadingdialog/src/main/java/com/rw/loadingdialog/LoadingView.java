@@ -5,19 +5,21 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
-import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * Created by ravindu on 14/06/17.
@@ -30,102 +32,136 @@ public class LoadingView
 {
     private RelativeLayout mRootLayout;
     private ViewGroup mTargetView;
-    private View background;
-    private ProgressBar progress;
+    private View mBackground;
+    private ProgressBar mProgressBar;
+    private RelativeLayout mRetryContainer;
+    private Rect mMargins;
 
     @ColorInt
-    private int defaultBackgroundColor = Color.TRANSPARENT;
+    private Integer mBackgroundColor;
     @ColorInt
-    private int accentColor = Color.RED;
+    private Integer mProgressColor;
+
 
     private Context mContext;
-    private boolean touchThroughDisabled = true;
+    private boolean mTouchThroughDisabled = true;
+    private TextView mRetryText;
+    private Button mRetryButton;
 
 
-    public LoadingView(Activity activity)
+    public static class Builder
     {
-        mTargetView = (ViewGroup) activity.findViewById(android.R.id.content);
-        mContext = activity;
+        private Integer mBckClr;
+        private Integer mProgClr;
+        private boolean mTouchDsbld = true;
+        private ViewGroup mTarget;
+        private Context ctx;
+        private Rect mMrgns;
+
+        public Builder(Context c)
+        {
+            this.ctx = c;
+        }
+
+        public Builder setProgressColor(@ColorInt int color)
+        {
+            mProgClr = color;
+            return this;
+        }
+
+        public Builder setProgressColorResource(@ColorRes int color)
+        {
+            mProgClr = ContextCompat.getColor(ctx, color);
+            return this;
+        }
+
+        public Builder setBackgroundColor(@ColorInt int color)
+        {
+            mBckClr = color;
+            return this;
+        }
+
+        public Builder setBackgroundColorRes(@ColorRes int color)
+        {
+            mBckClr = ContextCompat.getColor(ctx, color);
+            return this;
+        }
+
+        public Builder setCustomMargins(@Px int left, @Px int top, @Px int right, @Px int bottom)
+        {
+            mMrgns = new Rect(left, top, right, bottom);
+            return this;
+        }
+
+        public Builder setCustomMarginDimensions(@DimenRes int left, @DimenRes int top, @DimenRes int right, @DimenRes int bottom)
+        {
+            Resources resources = ctx.getResources();
+
+            int l = left > 0 ? resources.getDimensionPixelSize(left) : 0;
+            int t = top > 0 ? resources.getDimensionPixelSize(top) : 0;
+            int r = right > 0 ? resources.getDimensionPixelSize(right) : 0;
+            int b = bottom > 0 ? resources.getDimensionPixelSize(bottom) : 0;
+
+            mMrgns = new Rect(l, t, r, b);
+            return this;
+        }
+
+        public LoadingView attachTo(Activity act)
+        {
+            mTarget = (ViewGroup) act.findViewById(android.R.id.content);
+
+            return attachTo(mTarget);
+        }
+
+        public LoadingView attachTo(ViewGroup target)
+        {
+            mTarget = target;
+
+            return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns);
+        }
+    }
+
+    private LoadingView(ViewGroup target, Integer progCol, Integer backCol, boolean touchDisabled, Rect margins)
+    {
+        this.mTargetView = target;
+        this.mProgressColor = progCol;
+        this.mBackgroundColor = backCol;
+        this.mTouchThroughDisabled = touchDisabled;
+        this.mMargins = margins;
+        this.mContext = mTargetView.getContext();
 
         init();
     }
 
-    public LoadingView(Activity activity, @ColorInt int progressColor, @ColorInt int backgroundColor)
-    {
-        mTargetView = (ViewGroup) activity.findViewById(android.R.id.content);
-        mContext = activity;
-
-        this.accentColor = progressColor;
-        this.defaultBackgroundColor = backgroundColor;
-
-        init();
-    }
-
-    public LoadingView(Activity activity, @ColorRes int progressColor, @ColorRes int backgroundColor, @Nullable String tag)
-    {
-        mTargetView = (ViewGroup) activity.findViewById(android.R.id.content);
-        mContext = activity;
-
-        this.accentColor = ContextCompat.getColor(mContext, progressColor);
-        this.defaultBackgroundColor = ContextCompat.getColor(mContext, backgroundColor);
-
-        init();
-    }
-
-    public LoadingView(ViewGroup rootView)
-    {
-        mTargetView = rootView;
-        mContext = rootView.getContext();
-
-        init();
-    }
-
-    public LoadingView(ViewGroup rootView, @ColorInt int progressColor, @ColorInt int backgroundColor)
-    {
-        mTargetView = rootView;
-        mContext = rootView.getContext();
-
-        this.accentColor = progressColor;
-        this.defaultBackgroundColor = backgroundColor;
-
-        init();
-    }
-
-    public LoadingView(ViewGroup rootView, @ColorRes int progressColor, @ColorRes int backgroundColor, @Nullable String tag)
-    {
-        mTargetView = rootView;
-        mContext = rootView.getContext();
-
-        this.accentColor = ContextCompat.getColor(mContext, progressColor);
-        this.defaultBackgroundColor = ContextCompat.getColor(mContext, backgroundColor);
-
-        init();
-    }
 
     private void init()
     {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         mRootLayout = (RelativeLayout) inflater.inflate(R.layout.rw_layout_progress, mTargetView, false);
 
-        background = mRootLayout.findViewById(R.id.rw_loadingview_background);
-        progress = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress);
+        mBackground = mRootLayout.findViewById(R.id.rw_loadingview_background);
+        mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress);
+        mRetryContainer = (RelativeLayout) mRootLayout.findViewById(R.id.rw_loadingview_retry_container);
+
+        mRetryText = (TextView) mRootLayout.findViewById(R.id.rw_loading_failed_text);
+        mRetryButton = (Button) mRootLayout.findViewById(R.id.rw_loadingview_btn_retry);
+
+        mRetryContainer.setVisibility(View.GONE);
 
         mRootLayout.setOnTouchListener(touchListener);
 
-        if(accentColor == -1)
-            accentColor = Utils.getAccentColor(mContext);
+        if(mProgressColor != null)
+            setProgressColor(mProgressColor);
 
-        if(accentColor != -1)
-            setProgressColor(accentColor);
+        if(mBackgroundColor != null)
+            setBackgroundColor(mBackgroundColor);
 
-
-
-        resetBackgroundColor();
-
+        if(mMargins != null)
+            setCustomMargins(mMargins.left, mMargins.top, mMargins.right, mMargins.bottom);
     }
 
     /**
-     * Sets a margin to the coloured background (not the full view)
+     * Sets a margin to the coloured mBackground (not the full view)
      * @param left  left margin in pixels
      * @param top   top margin in pixels
      * @param right right margin in pixels
@@ -133,9 +169,9 @@ public class LoadingView
      */
     public void setCustomMargins(@Px int left, @Px int top, @Px int right, @Px int bottom)
     {
-        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) background.getLayoutParams();
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBackground.getLayoutParams();
         lp.setMargins(left, top, right, bottom);
-        background.setLayoutParams(lp);
+        mBackground.setLayoutParams(lp);
     }
 
     /**
@@ -156,9 +192,9 @@ public class LoadingView
         int r = right > 0 ? resources.getDimensionPixelSize(right) : 0;
         int b = bottom > 0 ? resources.getDimensionPixelSize(bottom) : 0;
 
-        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) background.getLayoutParams();
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBackground.getLayoutParams();
         lp.setMargins(l, t, r, b);
-        background.setLayoutParams(lp);
+        mBackground.setLayoutParams(lp);
     }
 
     /**
@@ -167,7 +203,7 @@ public class LoadingView
      */
     public void setTouchThroughEnabled(boolean enabled)
     {
-        this.touchThroughDisabled = !enabled;
+        this.mTouchThroughDisabled = !enabled;
     }
 
     /**
@@ -189,35 +225,35 @@ public class LoadingView
     }
 
     /**
-     * Sets the color of the loadingview background
-     * @param color background color
+     * Sets the color of the loadingview mBackground
+     * @param color mBackground color
      */
     public void setBackgroundColor(@ColorInt int color)
     {
-        background.setBackgroundColor(color);
+        mBackground.setBackgroundColor(color);
     }
 
     /**
-     * Sets the background color
-     * @param color background color resource
+     * Sets the mBackground color
+     * @param color mBackground color resource
      */
     public void setBackgroundColorResource(@ColorRes int color)
     {
-        background.setBackgroundColor(ContextCompat.getColor(mContext, color));
+        mBackground.setBackgroundColor(ContextCompat.getColor(mContext, color));
     }
 
     /**
-     * Resets the background color to the default.
+     * Resets the mBackground color to the default.
      * Default color is {@link Color#WHITE} or what was passed in the constructor
      */
     public void resetBackgroundColor()
     {
-        background.setBackgroundColor(defaultBackgroundColor);
+        mBackground.setBackgroundColor(Color.TRANSPARENT);
     }
 
     /**
-     * sets the progress spinner color
-     * @param color progress color
+     * sets the mProgressBar spinner color
+     * @param color mProgressBar color
      */
     public void setProgressColor(@ColorInt int color)
     {
@@ -225,14 +261,14 @@ public class LoadingView
             resetProgressColor();
         else
         {
-            Drawable drawable = progress.getIndeterminateDrawable();
+            Drawable drawable = mProgressBar.getIndeterminateDrawable();
             drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         }
     }
 
     /**
-     * sets the progress spinner color
-     * @param color progress color resource
+     * sets the mProgressBar spinner color
+     * @param color mProgressBar color resource
      */
     public void setProgressColorResource(@ColorRes int color)
     {
@@ -240,12 +276,12 @@ public class LoadingView
     }
 
     /**
-     * resets the progress spinner color to the default.
+     * resets the mProgressBar spinner color to the default.
      * Default is {@link Color#RED} or what was passed in via the constructor
      */
     public void resetProgressColor()
     {
-        Drawable drawable = progress.getIndeterminateDrawable();
+        Drawable drawable = mProgressBar.getIndeterminateDrawable();
         drawable.clearColorFilter();
     }
 
@@ -254,7 +290,7 @@ public class LoadingView
         @Override
         public boolean onTouch(View v, MotionEvent event)
         {
-            return touchThroughDisabled;
+            return mTouchThroughDisabled;
         }
     };
 }
