@@ -27,11 +27,15 @@ public class MainActivity extends AppCompatActivity
         FrameLayout frame = (FrameLayout)findViewById(R.id.framelayout);
 
         LoadingView view = new LoadingView.Builder(this)
+                                .setProgressStyle(LoadingView.ProgressStyle.HORIZONTAL)
                                 .setBackgroundColor(Color.WHITE)
                                 .setCustomMargins(0, 100, 100, 0)
+                                .setHorizontalBarMarginPercentage(0.2f)
                                 .attachTo(frame);
 
         view.show();
+
+
 
 //        view.setProgressColor(Color.RED);
 //

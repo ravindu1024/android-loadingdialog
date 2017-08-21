@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -36,6 +37,8 @@ public class LoadingView
     private ProgressBar mProgressBar;
     private RelativeLayout mRetryContainer;
     private Rect mMargins;
+    private boolean mIsIndeterminate = true;
+    private int mProgress = 0;
 
     @ColorInt
     private Integer mBackgroundColor;
@@ -48,6 +51,11 @@ public class LoadingView
     private TextView mRetryText;
     private Button mRetryButton;
 
+    public enum ProgressStyle
+    {
+        HORIZONTAL, CYCLIC;
+    }
+
 
     public static class Builder
     {
@@ -57,6 +65,9 @@ public class LoadingView
         private ViewGroup mTarget;
         private Context ctx;
         private Rect mMrgns;
+        private ProgressStyle mStyl = ProgressStyle.CYCLIC;
+        private boolean mIndtrmnt = true;
+        private float mHBarMarginPer = 0.1f;
 
         public Builder(Context c)
         {
@@ -93,6 +104,18 @@ public class LoadingView
             return this;
         }
 
+        public Builder setProgressStyle(ProgressStyle style)
+        {
+            mStyl = style;
+            return this;
+        }
+
+        public Builder setIndeterminate(boolean indeterminate)
+        {
+            mIndtrmnt = indeterminate;
+            return this;
+        }
+
         public Builder setCustomMarginDimensions(@DimenRes int left, @DimenRes int top, @DimenRes int right, @DimenRes int bottom)
         {
             Resources resources = ctx.getResources();
@@ -103,6 +126,14 @@ public class LoadingView
             int b = bottom > 0 ? resources.getDimensionPixelSize(bottom) : 0;
 
             mMrgns = new Rect(l, t, r, b);
+            return this;
+        }
+
+        public Builder setHorizontalBarMarginPercentage(float percentage)
+        {
+            if(percentage < 0.41f)
+                mHBarMarginPer = percentage;
+
             return this;
         }
 
@@ -117,11 +148,11 @@ public class LoadingView
         {
             mTarget = target;
 
-            return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns);
+            return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns, mStyl, mIndtrmnt, mHBarMarginPer);
         }
     }
 
-    private LoadingView(ViewGroup target, Integer progCol, Integer backCol, boolean touchDisabled, Rect margins)
+    private LoadingView(ViewGroup target, Integer progCol, Integer backCol, boolean touchDisabled, Rect margins, ProgressStyle style, boolean indeterminate, float hbarMargin)
     {
         this.mTargetView = target;
         this.mProgressColor = progCol;
@@ -129,19 +160,43 @@ public class LoadingView
         this.mTouchThroughDisabled = touchDisabled;
         this.mMargins = margins;
         this.mContext = mTargetView.getContext();
+        this.mIsIndeterminate = indeterminate;
 
-        init();
+        init(style, hbarMargin);
     }
 
 
-    private void init()
+    private void init(ProgressStyle style, final float marginPercentge)
     {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         mRootLayout = (RelativeLayout) inflater.inflate(R.layout.rw_layout_progress, mTargetView, false);
 
         mBackground = mRootLayout.findViewById(R.id.rw_loadingview_background);
-        mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress);
         mRetryContainer = (RelativeLayout) mRootLayout.findViewById(R.id.rw_loadingview_retry_container);
+
+        if(style == ProgressStyle.HORIZONTAL)
+        {
+            mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress2);
+
+            mProgressBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+            {
+                @Override
+                public void onGlobalLayout()
+                {
+                    mProgressBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                    RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mProgressBar.getLayoutParams();
+                    lp.setMarginStart((int) (mRootLayout.getWidth() * marginPercentge));
+                    lp.setMarginEnd((int) (mRootLayout.getWidth() * marginPercentge));
+
+                    mProgressBar.setLayoutParams(lp);
+                }
+            });
+        }
+        else
+            mProgressBar = (ProgressBar) mRootLayout.findViewById(R.id.rw_loadingview_progress);
+
+        mProgressBar.setVisibility(View.VISIBLE);
 
         mRetryText = (TextView) mRootLayout.findViewById(R.id.rw_loading_failed_text);
         mRetryButton = (Button) mRootLayout.findViewById(R.id.rw_loadingview_btn_retry);
@@ -158,6 +213,8 @@ public class LoadingView
 
         if(mMargins != null)
             setCustomMargins(mMargins.left, mMargins.top, mMargins.right, mMargins.bottom);
+
+        setIndeterminate(mIsIndeterminate);
     }
 
     /**
@@ -283,6 +340,18 @@ public class LoadingView
     {
         Drawable drawable = mProgressBar.getIndeterminateDrawable();
         drawable.clearColorFilter();
+    }
+
+    public void setIndeterminate(boolean indeterminate)
+    {
+        mProgressBar.setIndeterminate(indeterminate);
+        mIsIndeterminate = indeterminate;
+    }
+
+    public void setProgress(int progress)
+    {
+        mProgressBar.setProgress(progress);
+        mProgress = progress;
     }
 
     private View.OnTouchListener touchListener = new View.OnTouchListener()
