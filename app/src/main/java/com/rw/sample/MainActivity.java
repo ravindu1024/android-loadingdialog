@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -23,16 +24,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        LoadingDialog pd = new LoadingDialog(this, "loading", Color.RED);
-//        pd.show();
-//
-//        pd.setBackgroundColor(Color.CYAN);
-        //pd.setBackgroundDrawable(getResources().getDrawable(R.drawable.rw_rounded_rect_white));
+        ViewGroup retry = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_retry, null);
 
         ConstraintLayout frame = findViewById(R.id.framelayout);
 
         final LoadingView loadingView = new LoadingView.Builder(this)
                                 .setBackgroundColor(Color.WHITE)
+                                .setCustomRetryLayoutResource(R.layout.custom_retry)
                                 .attachTo(frame);
 
         loadingView.show();

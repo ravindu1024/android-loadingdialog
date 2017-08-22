@@ -19,26 +19,6 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true">
 
-            <TextView
-                android:id="@+id/rw_loading_failed_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingEnd="10dp"
-                android:paddingStart="10dp"
-                android:text="@string/load_failed"
-                android:textAlignment="center"/>
-
-            <Button
-                android:id="@+id/rw_loadingview_btn_retry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/rw_loading_failed_text"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:text="@string/retry_btn"/>
         </RelativeLayout>
 
         <ProgressBar

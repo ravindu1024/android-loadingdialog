@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.constraint.ConstraintLayout;
@@ -52,7 +53,7 @@ public class LoadingView
     private Context mContext;
     private boolean mTouchThroughDisabled = true;
     private TextView mRetryText;
-    private Button mRetryButton;
+    private TextView mRetryButton;
 
     public enum ProgressStyle
     {
@@ -76,6 +77,7 @@ public class LoadingView
         private ProgressStyle mStyl = ProgressStyle.CYCLIC;
         private boolean mIndtrmnt = true;
         private float mHBarMarginPer = 0.1f;
+        private ViewGroup mRtryLyt;
 
         public Builder(Context c)
         {
@@ -124,6 +126,22 @@ public class LoadingView
             return this;
         }
 
+        public Builder setCustomRetryLayout(ViewGroup retryLayout)
+        {
+            if(retryLayout.findViewById(R.id.label) == null || retryLayout.findViewById(R.id.button) == null)
+                throw new RuntimeException("Invalid layout. Should contain atleast two views named 'label' and 'button'");
+
+            mRtryLyt = retryLayout;
+            return this;
+        }
+
+        public Builder setCustomRetryLayoutResource(@LayoutRes int resId)
+        {
+            ViewGroup v = (ViewGroup) LayoutInflater.from(ctx).inflate(resId, null);
+
+            return setCustomRetryLayout(v);
+        }
+
         public Builder setCustomMarginDimensions(@DimenRes int left, @DimenRes int top, @DimenRes int right, @DimenRes int bottom)
         {
             Resources resources = ctx.getResources();
@@ -152,20 +170,23 @@ public class LoadingView
             return attachTo(mTarget);
         }
 
+
+
         public LoadingView attachTo(ViewGroup target)
         {
             mTarget = target;
 
             if(mTarget instanceof RelativeLayout || mTarget instanceof FrameLayout || mTarget instanceof ConstraintLayout)
             {
-                return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns, mStyl, mIndtrmnt, mHBarMarginPer);
+                return new LoadingView(mTarget, mProgClr, mBckClr, mTouchDsbld, mMrgns, mStyl, mIndtrmnt, mHBarMarginPer, mRtryLyt);
             }
             else
-                throw new RuntimeException("Unsupported target view. Parent should be one of RelativeLayout, FrameLayout and ConstraintLayout");
+                throw new RuntimeException("Unsupported target view. Parent should be one of RelativeLayout, FrameLayout or ConstraintLayout");
         }
     }
 
-    private LoadingView(ViewGroup target, Integer progCol, Integer backCol, boolean touchDisabled, Rect margins, ProgressStyle style, boolean indeterminate, float hbarMargin)
+    private LoadingView(ViewGroup target, Integer progCol, Integer backCol, boolean touchDisabled,
+                        Rect margins, ProgressStyle style, boolean indeterminate, float hbarMargin, ViewGroup retryLayout)
     {
         this.mTargetView = target;
         this.mProgressColor = progCol;
@@ -175,17 +196,26 @@ public class LoadingView
         this.mContext = mTargetView.getContext();
         this.mIsIndeterminate = indeterminate;
 
-        init(style, hbarMargin);
+        init(style, hbarMargin, retryLayout);
     }
 
 
-    private void init(ProgressStyle style, final float marginPercentge)
+    private void init(ProgressStyle style, final float marginPercentge, ViewGroup retryLayout)
     {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         mRootLayout = (RelativeLayout) inflater.inflate(R.layout.rw_layout_progress, mTargetView, false);
 
         mBackground = mRootLayout.findViewById(R.id.rw_loadingview_background);
         mRetryContainer = mRootLayout.findViewById(R.id.rw_loadingview_retry_container);
+
+
+        if(retryLayout == null)
+            retryLayout = (ViewGroup) inflater.inflate(R.layout.rw_layout_loading_retry, mRetryContainer, false);
+
+        mRetryContainer.addView(retryLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        mRetryText = retryLayout.findViewById(R.id.label);
+        mRetryButton = retryLayout.findViewById(R.id.button);
 
         if(style == ProgressStyle.HORIZONTAL)
         {
@@ -211,8 +241,7 @@ public class LoadingView
 
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mRetryText = mRootLayout.findViewById(R.id.rw_loading_failed_text);
-        mRetryButton = mRootLayout.findViewById(R.id.rw_loadingview_btn_retry);
+
 
         mRetryContainer.setVisibility(View.GONE);
 
