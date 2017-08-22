@@ -2,9 +2,6 @@
  - A non blocking customisable progress view that can can block click events without blocking the back button
  - A better looking loading dialog for Android inspired by ios
  
- ![alt tag](https://raw.githubusercontent.com/ravindu1024/android-loadingdialog/master/media/screen1.png)
- ![alt tag](https://raw.githubusercontent.com/ravindu1024/android-loadingdialog/master/media/screen2.png)
- ![alt tag](https://raw.githubusercontent.com/ravindu1024/android-loadingdialog/master/media/screen3.png)
  ![alt tag](https://raw.githubusercontent.com/ravindu1024/android-loadingdialog/master/media/video.gif)
  
  Installation:
