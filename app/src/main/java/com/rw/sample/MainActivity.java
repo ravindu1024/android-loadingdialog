@@ -30,10 +30,11 @@ public class MainActivity extends AppCompatActivity
 
         final LoadingView loadingView = new LoadingView.Builder(this)
                                 .setBackgroundColor(Color.WHITE)
-                                .setCustomRetryLayoutResource(R.layout.custom_retry)
+                                //.setCustomRetryLayoutResource(R.layout.custom_retry)
                                 .attachTo(frame);
 
         loadingView.show();
+
 
 
         Button b = (Button) findViewById(R.id.button_failed);
