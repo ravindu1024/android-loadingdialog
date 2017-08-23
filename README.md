@@ -4,7 +4,7 @@
  
  ![alt tag](https://raw.githubusercontent.com/ravindu1024/android-loadingdialog/master/media/video.gif)
  
- Installation:
+ # Installation:
  
  Add this to the main gradle file: 
  ```gradle
@@ -19,7 +19,7 @@
 Add this to your project gradle file:
 ```gradle
 	dependencies {
-	        compile 'com.github.ravindu1024:android-loadingdialog:1.0.2'
+	        compile 'com.github.ravindu1024:android-loadingdialog:1.0.3'
 	}
 
 ```
